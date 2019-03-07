@@ -1092,6 +1092,10 @@ idPlayer::idPlayer() {
 	deltaViewAngles			= ang_zero;
 	cmdAngles				= ang_zero;
 
+	level = 0; //current level
+	exp = 0; //current exp
+
+
 	demoViewAngleTime		= 0;
 	demoViewAngles			= ang_zero;
 
@@ -1269,7 +1273,7 @@ idPlayer::idPlayer() {
  	lastSnapshotSequence	= 0;
  
  	aimClientNum			= -1;
- 
+
  	spawnedTime				= 0;
  
  	isTelefragged			= false;

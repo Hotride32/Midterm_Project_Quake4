@@ -337,6 +337,9 @@ public:
 	idEntityPtr<idAnimatedEntity>	weaponWorldModel;
 	const idDeclEntityDef*			weaponDef;
 
+	int                     level; // current level of player
+	int                     exp; //current experience of player
+
 
  	idUserInterface *		hud;				// Common hud
 	idUserInterface *		mphud;				// hud overlay containing MP elements
