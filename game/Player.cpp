@@ -162,6 +162,8 @@ CLASS_DECLARATION( idActor, idPlayer )
 	EVENT( AI_SetHealth,					idPlayer::Event_SetHealth )
 //MCG: setArmor
 	EVENT( EV_Player_SetArmor,				idPlayer::Event_SetArmor )
+//	EVENT(AI_SetLevel, idPlayer::Event_SetLevel)
+//	EVENT(AI_SetExperience, idPlayer::Event_SetExperience)
 // RAVEN END;
 	EVENT( EV_Player_SetExtraProjPassEntity,idPlayer::Event_SetExtraProjPassEntity )
 //MCG: direct damage
@@ -334,7 +336,7 @@ void idInventory::RestoreInventory( idPlayer *owner, const idDict &dict ) {
 
 	//We might not need to clear it out.
 	//Clear();
-
+	
 	// health/armor
 	maxHealth		= dict.GetInt( "maxhealth", "100" );
 	armor			= dict.GetInt( "armor", "50" );
@@ -1092,8 +1094,6 @@ idPlayer::idPlayer() {
 	deltaViewAngles			= ang_zero;
 	cmdAngles				= ang_zero;
 
-	level = 0; //current level
-	exp = 0; //current exp
 
 
 	demoViewAngleTime		= 0;
@@ -11195,6 +11195,23 @@ idPlayer::Event_SetArmor
 void idPlayer::Event_SetArmor( float newArmor ) {
 	inventory.armor = idMath::ClampInt( 0 , inventory.maxarmor, newArmor );
 }
+/*
+=============
+idPlayer::Event_SetLevel
+=============
+
+void idPlayer::Event_SetLevel(float newLevel) {
+	level = idMath::ClampInt(1, 100, newLevel);
+}
+/*
+=============
+idPlayer::Event_SetExperience
+=============
+
+void idPlayer::Event_SetExperience(float newExperience) {
+	experience = idMath::ClampInt(1, 100, newExperience);
+}
+*/
 
 /*
 =============

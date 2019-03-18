@@ -3,6 +3,7 @@
 
 #include "../Game_local.h"
 
+
 CLASS_DECLARATION( idPhysics_Actor, idPhysics_Player )
 END_CLASS
 
@@ -44,6 +45,7 @@ const int PMF_TIME_WATERJUMP	= 128;		// movementTime is waterjump
 const int PMF_ALL_TIMES			= (PMF_TIME_WATERJUMP|PMF_TIME_LAND|PMF_TIME_KNOCKBACK);
 
 int c_pmove = 0;
+
 
 float idPhysics_Player::Pm_Accelerate( void ) {
 	return gameLocal.IsMultiplayer() ? PM_ACCELERATE_MP : PM_ACCELERATE_SP;
@@ -1273,11 +1275,16 @@ idPhysics_Player::CheckJump
 */
 bool idPhysics_Player::CheckJump( void ) {
 	idVec3 addVelocity;
-
+	float delta = 1.0;
+	idEntity* eplayer;
+	eplayer = gameLocal.GetLocalPlayer();
+	idPlayer* player = static_cast<idPlayer *>(eplayer);
+	int currLevel = player->level;
 	if ( command.upmove < 10 ) {
 		// not holding jump
 		return false;
 	}
+
 
 	// must wait for jump to be released
 	if ( current.movementFlags & PMF_JUMP_HELD ) {
@@ -1291,11 +1298,19 @@ bool idPhysics_Player::CheckJump( void ) {
 
 	groundPlane = false;		// jumping away
 	walking = false;
-	current.movementFlags |= PMF_JUMP_HELD | PMF_JUMPED;
+	current.movementFlags |= PMF_JUMPED;
+	//PMF_JUMP_HELD |
 
 	addVelocity = 2.0f * maxJumpHeight * -gravityVector;
 	addVelocity *= idMath::Sqrt( addVelocity.Normalize() );
 	current.velocity += addVelocity;
+	float oldtime = gameLocal.time;
+	if (delta <= 1.0 && currLevel >= 2 && command.upmove >= 10){
+		addVelocity = 1.0f * maxJumpHeight * -gravityVector;
+		addVelocity *= idMath::Sqrt(addVelocity.Normalize());
+		current.velocity += addVelocity;
+		delta += 1.0;
+	}
 
 // RAVEN BEGIN
 // bdube: crouch slide, nick maggoire is awesome

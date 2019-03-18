@@ -100,6 +100,8 @@ const idEventDef EV_PlayEffect( "playEffect", "ssd" );
 const idEventDef EV_StopEffect( "stopEffect", "s" );
 const idEventDef EV_StopAllEffects( "stopAllEffects" );
 const idEventDef EV_GetHealth ( "getHealth", NULL, 'f' );
+//const idEventDef EV_GetLevel("getLevel", NULL, 'f');
+//const idEventDef EV_GetExperience("getExperience", NULL, 'f');
 // bdube: surface related events
 const idEventDef EV_HideSurface( "hideSurface", "s" );
 const idEventDef EV_ShowSurface( "showSurface", "s" );
@@ -121,6 +123,8 @@ const idEventDef EV_AppendTarget( "appendTarget", "E", 'f' );
 const idEventDef EV_RemoveTarget( "removeTarget", "e" );
 // mekberg:
 const idEventDef EV_SetHealth( "setHealth", "f" );
+//const idEventDef EV_SetLevel("setLevel", "f");
+//const idEventDef EV_SetExperience("setExperience", "f");
 // RAVEN END
 
 ABSTRACT_DECLARATION( idClass, idEntity )
@@ -199,6 +203,8 @@ ABSTRACT_DECLARATION( idClass, idEntity )
 	EVENT( EV_StopEffect,			idEntity::Event_StopEffect )
 	EVENT( EV_StopAllEffects,		idEntity::Event_StopAllEffects )
 	EVENT( EV_GetHealth,			idEntity::Event_GetHealth )
+	//EVENT(EV_GetLevel, idEntity::Event_GetLevel)
+	//EVENT(EV_GetExperience, idEntity::Event_GetExperience)
 // bdube: mesh events
 	EVENT( EV_HideSurface,			idEntity::Event_HideSurface )
 	EVENT( EV_ShowSurface,			idEntity::Event_ShowSurface )
@@ -220,6 +226,8 @@ ABSTRACT_DECLARATION( idClass, idEntity )
 	EVENT( EV_RemoveTarget,			idEntity::Event_RemoveTarget )
 // mekberg: added
 	EVENT( EV_SetHealth,			idEntity::Event_SetHealth )
+	//EVENT(EV_SetLevel, idEntity::Event_SetLevel)
+	//EVENT(EV_SetExperience, idEntity::Event_SetExperience)
 // RAVEN END
 END_CLASS
 
@@ -491,6 +499,8 @@ idEntity::idEntity() {
 	renderView		= NULL;
 	cameraTarget	= NULL;
 	health			= 0;
+	level = 1;
+	experience = 0;
 
 	physics			= NULL;
 	bindMaster		= NULL;
@@ -642,6 +652,7 @@ void idEntity::Spawn( void ) {
 	}
 
 	health = spawnArgs.GetInt( "health" );
+	
 
 	InitDefaultPhysics( origin, axis );
 
@@ -766,6 +777,8 @@ void idEntity::Save( idSaveGame *savefile ) const {
 	}
 
 	savefile->WriteInt( health );
+	savefile->WriteInt(level);
+	savefile->WriteInt(experience);
 
 	savefile->WriteInt( clientEntities.Num() );
 	for( cent = clientEntities.Next(); cent; cent = cent->bindNode.Next() ) {
@@ -861,6 +874,8 @@ void idEntity::Restore( idRestoreGame *savefile ) {
 	}
 
 	savefile->ReadInt( health );
+	savefile->ReadInt(level);
+	savefile->ReadInt(experience);
 
 	savefile->ReadInt( num );
 	for( i = 0; i < num; i++ ) {
@@ -4459,6 +4474,25 @@ void idEntity::Event_GetHealth ( void ) {
 	idThread::ReturnFloat( health );
 }
 
+/*
+================
+idEntity::Event_GetLevel
+================
+
+void idEntity::Event_GetLevel(void) {
+	idThread::ReturnFloat(level);
+}
+
+/*
+================
+idEntity::Event_GetExperience
+================
+
+void idEntity::Event_GetExperience(void) {
+	idThread::ReturnFloat(experience);
+}
+*/
+
 // jscott:
 /*
 ================
@@ -4891,6 +4925,24 @@ idEntity::Event_SetHealth
 void idEntity::Event_SetHealth( float newHealth ) {
 	health =  newHealth;
 }
+
+/*
+================
+idEntity::Event_SetLevel
+================
+
+void idEntity::Event_SetLevel(float newLevel) {
+	level = newLevel;
+}
+/*
+================
+idEntity::Event_SetExperience
+================
+
+void idEntity::Event_SetExperience(float newExperience) {
+	experience = newExperience;
+}
+*/
 // RAVEN END
 
 /*
@@ -6196,6 +6248,8 @@ void idEntity::GetDebugInfo ( debugInfoProc_t proc, void* userData ) {
 	idClass::GetDebugInfo ( proc, userData );
 
 	proc ( "idEntity", "health",		va("%d",health), userData );
+	proc("idEntity", "level", va("%d", level), userData);
+	proc("idEntity", "experience", va("%d", experience), userData);
 	proc ( "idEntity", "name",			name, userData );
 	proc ( "idEntity", "entityNumber",  va("%d",entityNumber), userData );
 	proc ( "idEntity", "origin",		renderEntity.origin.ToString ( ), userData );

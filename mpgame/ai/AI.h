@@ -422,6 +422,7 @@ extern const idEventDef AI_DisableBlink;
 extern const idEventDef AI_EnableAutoBlink;
 extern const idEventDef AI_DisableAutoBlink;
 
+
 class idPathCorner;
 class idProjectile;
 class rvSpawner;

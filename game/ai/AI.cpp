@@ -63,6 +63,9 @@ idAI::idAI ( void ) {
 	enemy.lastVisibleChangeTime	= 0;
 	enemy.lastVisibleTime		= 0;
 
+	//level = 1;
+	//experience = 95;
+
 	fl.neverDormant			= false;		// AI's can go dormant
 
 	allowEyeFocus			= true;
@@ -278,6 +281,8 @@ void idAI::Save( idSaveGame *savefile ) const {
 	savefile->WriteFloat ( combat.threatCurrent );
 	savefile->WriteInt	 ( combat.coverValidTime );
 	savefile->WriteInt   ( combat.maxInvalidCoverTime );
+	savefile->WriteInt(level);
+	savefile->WriteInt(experience);
 
 	// Passive state variables
 	savefile->WriteString ( passive.prefix );
@@ -487,6 +492,8 @@ void idAI::Restore( idRestoreGame *savefile ) {
 	savefile->ReadFloat ( combat.threatCurrent );
 	savefile->ReadInt	 ( combat.coverValidTime );
 	savefile->ReadInt   ( combat.maxInvalidCoverTime );
+	savefile->ReadInt(level);
+	savefile->ReadInt(experience);
 
 	// Passive state variables
 	savefile->ReadString ( passive.prefix );
@@ -3667,6 +3674,9 @@ idAI::
 */
 
 void idAI::OnDeath( void ){
+	idEntity* eplayer;
+	eplayer = gameLocal.GetLocalPlayer();
+	idPlayer* player = static_cast<idPlayer *>(eplayer);
 	if( vehicleController.IsDriving() ){
 		usercmd_t				usercmd;
 
@@ -3679,9 +3689,9 @@ void idAI::OnDeath( void ){
 		// Fixme!  Is this safe to do immediately?
 		vehicleController.Eject();
 	}
-
+	int point = 10;
 	aiManager.RemoveTeammate ( this );
-
+	
 	ExecScriptFunction( funcs.death );
 
 
@@ -3729,7 +3739,41 @@ void idAI::OnDeath( void ){
 			spawnArgs.Set("def_dropsItem1", "item_health_mega");
 		}
 	
+		
+		//int exp = *Event_GetExperience();
+		//int lev = *Event_GetLevel();
 
+
+
+		//if ( experience + point > 99){
+			//Event_SetLevel( lev + 1);
+			//Event_SetExperience( exp + point - 100);
+			//level += 1;
+			//experience = experience + point - 100;
+		//}
+		//else {
+			//Event_SetExperience(exp + point);
+		//	experience += point;
+		//}
+
+		
+		
+		//gameLocal.Printf("\rtt = %4d", experience);
+		//gameLocal.Printf("\rtt = %4d", level);
+		//gameLocal.Printf("\rtt = %4d", point);
+
+		
+		if (player->experience + point > 99){
+			player->level += 1;
+			player->experience = (player->experience + point) -100;	
+		}
+		else{
+			player->experience = player->experience + point;
+		}
+
+		gameLocal.Printf("experience:%i level:%i \n", player->experience, player->level);
+		
+		
 }
 
 /*

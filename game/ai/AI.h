@@ -421,6 +421,10 @@ extern const idEventDef AI_EnableBlink;
 extern const idEventDef AI_DisableBlink;
 extern const idEventDef AI_EnableAutoBlink;
 extern const idEventDef AI_DisableAutoBlink;
+//extern const idEventDef AI_SetLevel;
+//extern const idEventDef AI_SetExperience;
+//extern const idEventDef AI_GetLevel;
+//extern const idEventDef AI_GetExperience;
 
 class idPathCorner;
 class idProjectile;
@@ -864,6 +868,9 @@ public:
 
 	rvAASTacticalSensor*	aasSensor;
 
+	//int level;
+    //int experience;
+
 	idEntityPtr<rvAITether>	tether;
 	idEntityPtr<rvAIHelper>	helperCurrent;
 	idEntityPtr<rvAIHelper>	helperIdeal;
@@ -1094,10 +1101,14 @@ private:
 	void					Event_SetScript						( const char* scriptName, const char* funcName );
 	void					Event_SetMoveSpeed					( int speed );
 	void					Event_SetPassivePrefix				( const char* prefix );
+	//void				Event_SetLevel(int newlevel);
+	//void				Event_SetExperience(int newexperience);
 
 	void					Event_GetAngles						( void );
 	void					Event_GetEnemy						( void );
 	void					Event_GetLeader						( void );
+	//int	*				Event_GetLevel(void);
+	//int	*				Event_GetExperience(void);
 
 	void					Event_Attack						( const char* attackName, const char* jointName );
 	void					Event_AttackMelee					( const char *meleeDefName );

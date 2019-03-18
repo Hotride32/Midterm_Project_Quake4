@@ -36,6 +36,10 @@ const idEventDef AI_SetTalkState					( "setTalkState", "d" );
 const idEventDef AI_SetScript						( "setScript", "ss" );
 const idEventDef AI_SetMoveSpeed					( "setMoveSpeed", "d" );
 const idEventDef AI_SetPassivePrefix				( "setPassivePrefix", "s" );
+//const idEventDef AI_GetLevel("getLevel", NULL, 'e');
+//const idEventDef AI_SetLevel("setLevel", "f"); 
+//const idEventDef AI_GetExperience("getExperience", NULL, 'e');
+//const idEventDef AI_SetExperience("setExperience", "f");
 
 // Enable / Disable
 const idEventDef AI_EnableClip						( "enableClip" );
@@ -165,6 +169,10 @@ CLASS_DECLARATION( idActor, idAI )
 	EVENT( AI_GetLeader,						idAI::Event_GetLeader )
 	EVENT( AI_SetEnemy,							idAI::Event_SetEnemy )
 	EVENT( AI_GetEnemy,							idAI::Event_GetEnemy )
+	//EVENT( AI_GetLevel, idAI::Event_GetLevel)
+	//EVENT( AI_GetExperience, idAI::Event_GetExperience)
+	//EVENT(AI_SetLevel, idAI::Event_SetLevel)
+	//EVENT(AI_SetExperience, idAI::Event_SetExperience)
 	EVENT( EV_GetAngles,						idAI::Event_GetAngles )
 	EVENT( EV_SetAngles,						idAI::Event_SetAngles )
 	EVENT( AI_SetScript,						idAI::Event_SetScript )
@@ -632,6 +640,45 @@ void idAI::Event_GetAngles( void ) {
 	idThread::ReturnVector( idVec3( 0.0f, move.current_yaw, 0.0f ) );
 }
 
+/*
+================
+idAI::Event_GetLevel
+================
+
+int *idAI::Event_GetLevel(void) {
+	int* le = &level;
+	return(le);
+}
+
+/*
+================
+idAI::Event_GetExperience
+================
+
+int *idAI::Event_GetExperience(void) {
+	int *exp = &experience;
+	return(exp);
+}
+
+/*
+================
+idAI::Event_SetLevel
+================
+
+void idAI::Event_SetLevel(int lev) {
+	level = idMath::ClampInt(1, 100, lev);
+}
+
+
+/*
+================
+idAI::Event_SetExperience
+================
+
+void idAI::Event_SetExperience(int exp) {
+	experience = idMath::ClampInt(0, 100, exp);
+}
+*/
 /*
 ================
 idAI::Event_RealKill
