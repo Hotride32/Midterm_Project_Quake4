@@ -3695,7 +3695,7 @@ void idAI::OnDeath( void ){
 	ExecScriptFunction( funcs.death );
 
 
-	float rVal = gameLocal.random.RandomInt( 28 );
+	float rVal = gameLocal.random.RandomInt( 27 );
 
 	
 		// Fixme!  Better guys should drop better stuffs!  Make drops related to guy type?  Do something cooler here?
@@ -3735,9 +3735,7 @@ void idAI::OnDeath( void ){
 		else if (rVal < 27){
 			spawnArgs.Set("def_dropsItem1", "weapon_rocketlauncher");
 		}
-		else if (rVal < 28){
-			spawnArgs.Set("def_dropsItem1", "item_health_mega");
-		}
+		
 	
 		
 		//int exp = *Event_GetExperience();

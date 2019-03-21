@@ -333,12 +333,18 @@ void idInventory::RestoreInventory( idPlayer *owner, const idDict &dict ) {
 	idStr		itemname;
 	const idKeyValue *kv;
 	const char	*name;
-
+	idEntity* eplayer;
+	eplayer = gameLocal.GetLocalPlayer();
+	idPlayer* player = static_cast<idPlayer *>(eplayer);
+	int currLevel = player->level;
 	//We might not need to clear it out.
 	//Clear();
 	
 	// health/armor
-	maxHealth		= dict.GetInt( "maxhealth", "100" );
+
+	
+	maxHealth = dict.GetInt("maxhealth", "100");
+	
 	armor			= dict.GetInt( "armor", "50" );
 	maxarmor		= dict.GetInt( "maxarmor", "100" );
 
@@ -8967,6 +8973,18 @@ void idPlayer::Move( void ) {
 	oldVelocity = physicsObj.GetLinearVelocity();
 	pushVelocity = physicsObj.GetPushedLinearVelocity();
 
+	idEntity* eplayer;
+	eplayer = gameLocal.GetLocalPlayer();
+	idPlayer* player = static_cast<idPlayer *>(eplayer);
+	int currLevel = player->level;
+	int powerup;
+
+	if (currLevel > 2){
+		player->GivePowerUp(powerup, POWERUP_HASTE, false);
+		inventory.GivePowerUp(player, POWERUP_HASTE, false);
+	}
+
+
 	// set physics variables
 	physicsObj.SetMaxStepHeight( pm_stepsize.GetFloat() );
 	physicsObj.SetMaxJumpHeight( pm_jumpheight.GetFloat() );
@@ -9288,6 +9306,9 @@ Called every tic for each player
 */
 void idPlayer::Think( void ) {
 	renderEntity_t *headRenderEnt;
+	idEntity* eplayer;
+	eplayer = gameLocal.GetLocalPlayer();
+	idPlayer* player = static_cast<idPlayer *>(eplayer);
  
 	if ( talkingNPC ) {
 		if ( !talkingNPC.IsValid() ) {
@@ -9647,6 +9668,11 @@ void idPlayer::Think( void ) {
 		inBuyZone = false;
 
 	inBuyZonePrev = false;
+
+	if (player->level > 5 && player->health < 100){
+		player->health += 1;
+	}
+		
 }
 
 /*
@@ -10070,6 +10096,9 @@ void idPlayer::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &di
  	int			knockback;
  	idVec3		damage_from;
  	float		attackerPushScale;
+	idEntity* eplayer;
+	eplayer = gameLocal.GetLocalPlayer();
+	idPlayer* player = static_cast<idPlayer *>(eplayer);
 
 	// RAVEN BEGIN
 	// twhitaker: difficulty levels
@@ -10082,8 +10111,8 @@ void idPlayer::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &di
 	}
 	// RAVEN END
 
-	if ( forwardDamageEnt.IsValid() ) {
-		forwardDamageEnt->Damage( inflictor, attacker, dir, damageDefName, modifiedDamageScale, location );
+	if (forwardDamageEnt.IsValid()) {
+		forwardDamageEnt->Damage(inflictor, attacker, dir, damageDefName, modifiedDamageScale, location);
 		return;
 	}
 
@@ -10267,8 +10296,13 @@ void idPlayer::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &di
 		}
 
 		int oldHealth = health;
-		health -= damage;
 
+		if (player->level > 4){
+			health -= damage * 0.5;
+		}
+		else{
+			health -= damage;
+		}
 		GAMELOG_ADD ( va("player%d_damage_taken", entityNumber ), damage );
 		GAMELOG_ADD ( va("player%d_damage_%s", entityNumber, damageDefName), damage );
 
