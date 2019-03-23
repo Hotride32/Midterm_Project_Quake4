@@ -18,6 +18,7 @@
 #include "Healing_Station.h"
 #include "ai/AI_Medic.h"
 
+
 // RAVEN BEGIN
 // nrausch: support for turning the weapon change ui on and off
 #ifdef _XENON
@@ -1100,7 +1101,7 @@ idPlayer::idPlayer() {
 	deltaViewAngles			= ang_zero;
 	cmdAngles				= ang_zero;
 
-
+	
 
 	demoViewAngleTime		= 0;
 	demoViewAngles			= ang_zero;
@@ -1335,6 +1336,8 @@ idPlayer::idPlayer() {
 	jumpDuringHitch = false;
 
 	lastPickupTime = 0;
+
+	int oldClipSize = 0;
 
 	int		i;
 
@@ -3408,6 +3411,14 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 		_hud->SetStateInt	( "player_health", health < -100 ? -100 : health );
 		_hud->SetStateFloat	( "player_healthpct", idMath::ClampFloat ( 0.0f, 1.0f, (float)health / (float)inventory.maxHealth ) );
 		_hud->HandleNamedEvent ( "updateHealth" );
+	}
+
+	temp = _hud->State().GetInt("player_level", "-1");
+	if (temp != level) {
+		_hud->SetStateInt("player_levelDelta", temp == -1 ? 0 : (temp - level));
+		_hud->SetStateInt("player_level", level < -100 ? -100 : level);
+		_hud->SetStateFloat("player_levelpct", idMath::ClampFloat(0.0f, 1.0f, (float)level / 100.0f));
+		_hud->HandleNamedEvent("updatelevel");
 	}
 		
 	temp = _hud->State().GetInt ( "player_armor", "-1" );
@@ -6522,6 +6533,29 @@ bool idPlayer::HandleSingleGuiCommand( idEntity *entityGui, idLexer *src ) {
 		PerformImpulse( IMPULSE_17 );
 		return true;
 	}
+
+	if (token.Icmp("addlevel") == 0) {
+		if (entityGui && level < 100) {
+			int _level = entityGui->spawnArgs.GetInt("gui_parm1");
+			int amt = (_level >= HEALTH_PER_DOSE) ? HEALTH_PER_DOSE : _level;
+			_level -= amt;
+			entityGui->spawnArgs.SetInt("gui_parm1", _level);
+			if (entityGui->GetRenderEntity() && entityGui->GetRenderEntity()->gui[0]) {
+				entityGui->GetRenderEntity()->gui[0]->SetStateInt("gui_parm1", _level);
+			}
+			level += amt;
+			if (level > 100) {
+				level = 100;
+			}
+		}
+		return true;
+	}
+
+	if (token.Icmp("ready") == 0) {
+		PerformImpulse(IMPULSE_17);
+		return true;
+	}
+
 
 // RAVEN BEGIN
 // twhitaker: no more database system
@@ -9672,7 +9706,14 @@ void idPlayer::Think( void ) {
 	if (player->level > 5 && player->health < 100){
 		player->health += 1;
 	}
-		
+
+	
+
+	if (player->level > 5 && (weapon->clipSize) != player->oldClipSize + 10 && weapon->ammoType != weapon->GetAmmoIndexForName("ammo_blaster")){
+		player->oldClipSize = weapon->clipSize;
+		weapon->clipSize += 10;
+	}
+	
 }
 
 /*

@@ -24,6 +24,7 @@ protected:
 	bool				UpdateAttack		( void );
 	bool				UpdateFlashlight	( void );
 	void				Flashlight			( bool on );
+	float					oldspread;
 
 private:
 
@@ -410,6 +411,7 @@ stateResult_t rvWeaponBlaster::State_Fire ( const stateParms_t& parms ) {
 			//don't fire if we're targeting a gui.
 			idPlayer* player;
 			player = gameLocal.GetLocalPlayer();
+			
 
 			//make sure the player isn't looking at a gui first
 			if( player && player->GuiActive() )	{
@@ -424,34 +426,86 @@ stateResult_t rvWeaponBlaster::State_Fire ( const stateParms_t& parms ) {
 				return SRESULT_DONE;
 			}
 
-			
+			if (gameLocal.random.RandomInt(10) == 2){
+				oldspread = spread;
+				spread = 7;
+			}
+
+			if (GetKeyState(VK_OEM_COMMA) & 0x8000){
+				if (gameLocal.time - fireHeldTime > chargeTime) {
+					Attack(true, 5, spread, 0, 1.0f);
+					PlayEffect("fx_chargedflash", barrelJointView, false);
+					if (GetKeyState(0x56) % 0x8000){
+						PlayAnim(ANIMCHANNEL_ALL, "chargedfireS", parms.blendFrames);
+					}
+					else{
+						PlayAnim(ANIMCHANNEL_ALL, "chargedfire", parms.blendFrames);
+					}
+					
+				}
+				else {
+					Attack(false, 5, spread, 0, 1.0f);
+					PlayEffect("fx_normalflash", barrelJointView, false);
+					if (GetKeyState(0x56) % 0x8000){
+						PlayAnim(ANIMCHANNEL_ALL, "fire1S", parms.blendFrames);
+					}
+					else{
+						PlayAnim(ANIMCHANNEL_ALL, "fire", parms.blendFrames);
+					}
+
+				}
+
+			}
 
 			
-			if (gameLocal.random.RandomInt(4) == 2 && player->level > 3){
+			if (gameLocal.random.RandomInt(4) == 2 && player->level > 3 && !(GetKeyState(VK_OEM_COMMA) & 0x8000)){
 				if (gameLocal.time - fireHeldTime > chargeTime) {
 					Attack(true, 1, spread, 0, 4.0f);
 					PlayEffect("fx_chargedflash", barrelJointView, false);
-					PlayAnim(ANIMCHANNEL_ALL, "chargedfire", parms.blendFrames);
+					if (GetKeyState(0x56) % 0x8000){
+						PlayAnim(ANIMCHANNEL_ALL, "chargedfireS", parms.blendFrames);
+					}
+					else{
+						PlayAnim(ANIMCHANNEL_ALL, "chargedfire", parms.blendFrames);
+					}
 				}
 				else {
 					Attack(false, 1, spread, 0, 4.0f);
 					PlayEffect("fx_normalflash", barrelJointView, false);
-					PlayAnim(ANIMCHANNEL_ALL, "fire", parms.blendFrames);
+					if (GetKeyState(0x56) % 0x8000){
+						PlayAnim(ANIMCHANNEL_ALL, "fire1S", parms.blendFrames);
+					}
+					else{
+						PlayAnim(ANIMCHANNEL_ALL, "fire", parms.blendFrames);
+					}
+
 				}
 			}
 			else{
 				if (gameLocal.time - fireHeldTime > chargeTime) {
 					Attack(true, 1, spread, 0, 1.0f);
 					PlayEffect("fx_chargedflash", barrelJointView, false);
-					PlayAnim(ANIMCHANNEL_ALL, "chargedfire", parms.blendFrames);
+					if (GetKeyState(0x56) % 0x8000){
+						PlayAnim(ANIMCHANNEL_ALL, "chargedfireS", parms.blendFrames);
+					}
+					else{
+						PlayAnim(ANIMCHANNEL_ALL, "chargedfire", parms.blendFrames);
+					}
 				}
 				else {
 					Attack(false, 1, spread, 0, 1.0f);
 					PlayEffect("fx_normalflash", barrelJointView, false);
-					PlayAnim(ANIMCHANNEL_ALL, "fire", parms.blendFrames);
+					if (GetKeyState(0x56) % 0x8000){
+						PlayAnim(ANIMCHANNEL_ALL, "fire1S", parms.blendFrames);
+					}
+					else{
+						PlayAnim(ANIMCHANNEL_ALL, "fire", parms.blendFrames);
+					}
+					
 				}
 			}
 			fireHeldTime = 0;
+			spread = oldspread;
 			
 			return SRESULT_STAGE(FIRE_WAIT);
 		

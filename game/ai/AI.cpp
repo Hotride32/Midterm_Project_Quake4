@@ -3689,7 +3689,7 @@ void idAI::OnDeath( void ){
 		// Fixme!  Is this safe to do immediately?
 		vehicleController.Eject();
 	}
-	int point = 10;
+	int point = 20;
 	aiManager.RemoveTeammate ( this );
 	
 	ExecScriptFunction( funcs.death );

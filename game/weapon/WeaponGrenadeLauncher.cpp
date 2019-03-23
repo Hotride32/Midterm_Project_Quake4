@@ -26,7 +26,9 @@ private:
 	stateResult_t		State_Reload	( const stateParms_t& parms );
 
 	const char*			GetFireAnim() const { return (!AmmoInClip()) ? "fire_empty" : "fire"; }
+	const char*			GetFireSAnim() const { return (!AmmoInClip()) ? "fire_empty" : "fireS"; }
 	const char*			GetIdleAnim() const { return (!AmmoInClip()) ? "idle_empty" : "idle"; }
+	float					oldspread;
 	
 	CLASS_STATES_PROTOTYPE ( rvWeaponGrenadeLauncher );
 };
@@ -144,11 +146,40 @@ stateResult_t rvWeaponGrenadeLauncher::State_Fire ( const stateParms_t& parms ) 
 	};	
 	switch ( parms.stage ) {
 		case STAGE_INIT:
-			nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier ( PMOD_FIRERATE ));
-			Attack ( false, 1, spread, 0, 1.0f );
-			PlayAnim ( ANIMCHANNEL_ALL, GetFireAnim(), 0 );	
-			return SRESULT_STAGE ( STAGE_WAIT );
-	
+
+			idPlayer* player;
+			player = gameLocal.GetLocalPlayer();
+
+			if (gameLocal.random.RandomInt(10) == 2){
+				oldspread = spread;
+				spread = 7;
+			}
+
+			if (gameLocal.random.RandomInt(4) == 2 && player->level > 3 && !(GetKeyState(VK_OEM_COMMA) & 0x8000)){
+				nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+				Attack(false, 1, spread, 0, 4.0f);
+				
+			}
+
+			if (GetKeyState(VK_OEM_COMMA) & 0x8000){
+				nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+				Attack(false, 5, spread, 0, 1.0f);
+				
+			}
+			else{
+				nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+				Attack(false, 1, spread, 0, 1.0f);
+				
+			}
+			spread = oldspread;
+			if (GetKeyState(0x56) % 0x8000){
+				PlayAnim(ANIMCHANNEL_ALL, GetFireSAnim(), 0);
+			}
+			else{
+				PlayAnim(ANIMCHANNEL_ALL, GetFireAnim(), 0);
+			}
+			return SRESULT_STAGE(STAGE_WAIT);
+
 		case STAGE_WAIT:		
 			if ( wsfl.attack && gameLocal.time >= nextAttackTime && AmmoInClip() && !wsfl.lowerWeapon ) {
 				SetState ( "Fire", 0 );

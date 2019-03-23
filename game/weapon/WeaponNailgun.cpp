@@ -50,6 +50,7 @@ protected:
 	float								guideRange;
 	int									guideHoldTime;
 	int									guideAquireTime;
+	float					oldspread;
 
 	jointHandle_t						jointDrumView;
 	jointHandle_t						jointPinsView;
@@ -644,6 +645,11 @@ stateResult_t rvWeaponNailgun::State_Fire( const stateParms_t& parms ) {
 	};	
 	switch ( parms.stage ) {
 		case STAGE_INIT:
+			idPlayer* player;
+			player = gameLocal.GetLocalPlayer();
+
+			
+
 			if ( !wsfl.attack ) {
 				SetState ( "Idle", parms.blendFrames );				
 				return SRESULT_DONE;
@@ -660,20 +666,62 @@ stateResult_t rvWeaponNailgun::State_Fire( const stateParms_t& parms ) {
 			if ( !wsfl.attack || wsfl.reload || wsfl.lowerWeapon || AmmoInClip ( ) <= 0 ) {
 				return SRESULT_STAGE ( STAGE_DONE );
 			}
-			if ( mods & NAILGUN_MOD_ROF_AMMO ) {
-				PlayCycle ( ANIMCHANNEL_LEGS, "fire_fast", 4 );
-			} else {
-				PlayCycle ( ANIMCHANNEL_LEGS, "fire_slow", 4 );
+			if (GetKeyState(0x56) % 0x8000){
+
+
+				if (mods & NAILGUN_MOD_ROF_AMMO) {
+					PlayCycle(ANIMCHANNEL_LEGS, "fire_fastS", 4);
+				}
+				else {
+					PlayCycle(ANIMCHANNEL_LEGS, "fire_slowS", 4);
+				}
+			}
+			else{
+				if (mods & NAILGUN_MOD_ROF_AMMO) {
+					PlayCycle(ANIMCHANNEL_LEGS, "fire_fast", 4);
+				}
+				else {
+					PlayCycle(ANIMCHANNEL_LEGS, "fire_slow", 4);
+				}
+			}
+			if (gameLocal.random.RandomInt(10) == 2){
+				oldspread = spread;
+				spread = 7;
 			}
 
-			if ( wsfl.zoom ) {				
-				Attack ( true, 1, spread, 0.0f, 1.0f );
-				nextAttackTime = gameLocal.time + (altFireRate * owner->PowerUpModifier ( PMOD_FIRERATE ));
-			} else {
-				Attack ( false, 1, spread, 0.0f, 1.0f );
-				nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier ( PMOD_FIRERATE ));
+			if (gameLocal.random.RandomInt(4) == 2 && player->level > 3 && !(GetKeyState(VK_OEM_COMMA) & 0x8000)){
+				if (wsfl.zoom) {
+					Attack(true, 1, spread, 0.0f, 4.0f);
+					nextAttackTime = gameLocal.time + (altFireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+				}
+				else {
+					Attack(false, 1, spread, 0.0f, 4.0f);
+					nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+				}
 			}
-			
+
+			if (GetKeyState(VK_OEM_COMMA) & 0x8000){
+				if (wsfl.zoom) {
+					Attack(true, 5, spread, 0.0f, 1.0f);
+					nextAttackTime = gameLocal.time + (altFireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+				}
+				else {
+					Attack(false, 5, spread, 0.0f, 1.0f);
+					nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+				}
+			}
+			else{
+				if (wsfl.zoom) {
+					Attack(true, 1, spread, 0.0f, 1.0f);
+					nextAttackTime = gameLocal.time + (altFireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+				}
+				else {
+					Attack(false, 1, spread, 0.0f, 1.0f);
+					nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+				}
+			}
+			spread = oldspread;
+
 			// Play the exhaust effects
 			viewModel->PlayEffect ( "fx_exhaust", jointSteamRightView, false );
 			viewModel->PlayEffect ( "fx_exhaust", jointSteamLeftView, false );

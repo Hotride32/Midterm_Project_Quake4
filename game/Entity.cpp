@@ -499,8 +499,9 @@ idEntity::idEntity() {
 	renderView		= NULL;
 	cameraTarget	= NULL;
 	health			= 0;
-	level = 5;
-	experience = 90;
+	level = 1;
+	experience = 0;
+	oldClipSize = 0;
 
 	physics			= NULL;
 	bindMaster		= NULL;

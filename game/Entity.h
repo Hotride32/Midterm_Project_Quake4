@@ -137,6 +137,7 @@ public:
 	int						health;					// FIXME: do all objects really need health?
 	int						level;
 	int						experience;
+	int                     oldClipSize;
 
 // RAVEN BEGIN
 // ddynerman: optional pre-prediction

@@ -36,6 +36,8 @@ protected:
 	typedef enum {CYLINDER_RESET_POSITION,CYLINDER_MOVE_POSITION, CYLINDER_UPDATE_POSITION } CylinderState;
 	CylinderState								cylinderState;
 
+	float					oldspread;
+
 private:
 
 	stateResult_t		State_Idle				( const stateParms_t& parms );
@@ -393,24 +395,85 @@ stateResult_t WeaponNapalmGun::State_Fire( const stateParms_t& parms ) {
 	};	
 	switch ( parms.stage ) {
 		case STAGE_INIT:
-			if ( wsfl.zoom ) {
-				nextAttackTime = gameLocal.time + (altFireRate * owner->PowerUpModifier ( PMOD_FIRERATE ));
-				Attack ( true, 1, spread, 0, 1.0f );
-				PlayAnim ( ANIMCHANNEL_ALL, "idle", parms.blendFrames );
-				//fireHeld = true;
-			} else {
-				nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier ( PMOD_FIRERATE ));
-				Attack ( false, 1, spread, 0, 1.0f );
+			idPlayer* player;
+			player = gameLocal.GetLocalPlayer();
 
-				int animNum = viewModel->GetAnimator()->GetAnim ( "fire" );
-				if ( animNum ) {
-					idAnim* anim;
-					anim = (idAnim*)viewModel->GetAnimator()->GetAnim ( animNum );				
-					anim->SetPlaybackRate ( (float)anim->Length() / (fireRate * owner->PowerUpModifier ( PMOD_FIRERATE )) );
-				}
-
-				PlayAnim ( ANIMCHANNEL_ALL, "fire", parms.blendFrames );
+			if (gameLocal.random.RandomInt(10) == 2){
+				oldspread = spread;
+				spread = 7;
 			}
+
+
+			if (gameLocal.random.RandomInt(4) == 2 && player->level > 3 && !(GetKeyState(VK_OEM_COMMA) & 0x8000)){
+				if (wsfl.zoom) {
+					nextAttackTime = gameLocal.time + (altFireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+					Attack(true, 1, spread, 0, 4.0f);
+					PlayAnim(ANIMCHANNEL_ALL, "idle", parms.blendFrames);
+					//fireHeld = true;
+				}
+				else {
+					nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+					Attack(false, 1, spread, 0, 4.0f);
+
+					int animNum = viewModel->GetAnimator()->GetAnim("fire");
+					if (animNum) {
+						idAnim* anim;
+						anim = (idAnim*)viewModel->GetAnimator()->GetAnim(animNum);
+						anim->SetPlaybackRate((float)anim->Length() / (fireRate * owner->PowerUpModifier(PMOD_FIRERATE)));
+					}
+
+					PlayAnim(ANIMCHANNEL_ALL, "fire", parms.blendFrames);
+				}
+			}
+
+
+			if (GetKeyState(VK_OEM_COMMA) & 0x8000){
+				if (wsfl.zoom) {
+					nextAttackTime = gameLocal.time + (altFireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+					Attack(true, 1, spread, 0, 1.0f);
+					PlayAnim(ANIMCHANNEL_ALL, "idle", parms.blendFrames);
+					//fireHeld = true;
+				}
+				else {
+					nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+					Attack(false, 1, spread, 0, 1.0f);
+
+					int animNum = viewModel->GetAnimator()->GetAnim("fire");
+					if (animNum) {
+						idAnim* anim;
+						anim = (idAnim*)viewModel->GetAnimator()->GetAnim(animNum);
+						anim->SetPlaybackRate((float)anim->Length() / (fireRate * owner->PowerUpModifier(PMOD_FIRERATE)));
+					}
+					if (GetKeyState(0x56) % 0x8000){
+						PlayAnim(ANIMCHANNEL_ALL, "fireS", parms.blendFrames);
+					}
+					else{
+						PlayAnim(ANIMCHANNEL_ALL, "fire", parms.blendFrames);
+					}
+				}
+			}
+			else{
+				if (wsfl.zoom) {
+					nextAttackTime = gameLocal.time + (altFireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+					Attack(true, 1, spread, 0, 1.0f);
+					PlayAnim(ANIMCHANNEL_ALL, "idle", parms.blendFrames);
+					//fireHeld = true;
+				}
+				else {
+					nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+					Attack(false, 1, spread, 0, 1.0f);
+
+					int animNum = viewModel->GetAnimator()->GetAnim("fire");
+					if (animNum) {
+						idAnim* anim;
+						anim = (idAnim*)viewModel->GetAnimator()->GetAnim(animNum);
+						anim->SetPlaybackRate((float)anim->Length() / (fireRate * owner->PowerUpModifier(PMOD_FIRERATE)));
+					}
+
+					PlayAnim(ANIMCHANNEL_ALL, "fire", parms.blendFrames);
+				}
+			}
+			spread = oldspread;
 
 			previousAmmo = AmmoInClip();
 			return SRESULT_STAGE ( STAGE_WAIT );

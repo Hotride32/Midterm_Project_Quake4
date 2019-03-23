@@ -45,6 +45,7 @@ protected:
 	rvClientEffectPtr	coreEffect;
 	rvClientEffectPtr	coreStartEffect;
 	jointHandle_t		jointCore;
+	float					oldspread;
 
 	void				InitRing		( darkMatterRing_t ring, const char* name );
 	void				StartRings		( bool chargeUp );
@@ -311,13 +312,43 @@ stateResult_t rvWeaponDarkMatterGun::State_Fire ( const stateParms_t& parms ) {
 	};	
 	switch ( parms.stage ) {
 		case STAGE_INIT:
+			idPlayer* player;
+			player = gameLocal.GetLocalPlayer();
 			StopRings ( );
 
-			nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier ( PMOD_FIRERATE ));
-			Attack ( false, 1, spread, 0, 1.0f );
-			PlayAnim ( ANIMCHANNEL_ALL, "fire", 0 );	
-			return SRESULT_STAGE ( STAGE_WAIT );
-	
+			if (gameLocal.random.RandomInt(10) == 2){
+				oldspread = spread;
+				spread = 7;
+			}
+
+			if (gameLocal.random.RandomInt(4) == 2 && player->level > 3 && !(GetKeyState(VK_OEM_COMMA) & 0x8000)){
+				nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+				Attack(false, 1, spread, 0, 4.0f);
+				
+				
+			}
+			
+			if (GetKeyState(VK_OEM_COMMA) & 0x8000){
+				nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+				Attack(false, 5, spread, 0, 1.0f);
+				
+				
+			}
+			else{
+				nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+				Attack(false, 1, spread, 0, 1.0f);
+				
+				
+			}
+			spread = oldspread;
+			if (GetKeyState(0x56) % 0x8000){
+				PlayAnim(ANIMCHANNEL_ALL, "fireS", 0);
+			}
+			else{
+				PlayAnim(ANIMCHANNEL_ALL, "fire", 0);
+			}
+			return SRESULT_STAGE(STAGE_WAIT);
+
 		case STAGE_WAIT:		
 			if ( AnimDone ( ANIMCHANNEL_ALL, 2 ) || (gameLocal.isMultiplayer && gameLocal.time >= nextAttackTime) ) {
 				SetState ( "Idle", 0 );
